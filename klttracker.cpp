@@ -4,18 +4,22 @@ kltTracker::kltTracker(cv::Mat initialImage):
   termcrit(TermCriteria::COUNT|TermCriteria::EPS,20,0.03),
   subPixWinSize(10,10)
 {
-  vector<KeyPoint> initialFeatures;
-  vector<Point2f> initialPoints;
-  vector<pointHistory> initialHistory;
-
-  featureDetector->setMaxFeatures(200);
-
+  Mat grayImage;
   cvtColor(initialImage, grayImage, CV_BGR2GRAY);
-  featureDetector->detect( grayImage, initialFeatures );
-  KeyPoint::convert(initialFeatures, initialPoints);
-  cornerSubPix(grayImage, initialPoints, subPixWinSize, Size(-1,-1), termcrit);
 
-  for (int i = 0; i < initialPoints.size(); i++)
+  cout << "Initializing Tracker" << endl;
+  featureDetector = GFTTDetector::create(200, .01, 2);
+
+  vector<KeyPoint> initialFeatures;
+  featureDetector->detect( grayImage, initialFeatures );
+
+  vector<Point2f> initialPoints;
+  KeyPoint::convert(initialFeatures, oldPoints);
+  cornerSubPix(grayImage, oldPoints, subPixWinSize, Size(-1,-1), termcrit);
+
+  cout << "Detected Features" << endl;
+  vector<pointHistory> initialHistory;
+  for (int i = 0; i < oldPoints.size(); i++)
   {
     pointHistory extractedFeature;
     extractedFeature.frameIndex = frameIndex;
@@ -25,6 +29,8 @@ kltTracker::kltTracker(cv::Mat initialImage):
     featuresHistory.push_back(initialHistory);
     initialHistory.clear();
   }
+
+  grayImage.copyTo( oldFrame );
   frameIndex++;
 }
 
@@ -45,7 +51,7 @@ Mat kltTracker::update(Mat image)
   status.clear();
 
   cout << "------------ Detecting features -----------------" << endl;
-  findNewFeatures();
+  findNewFeatures(grayImage);
   grayImage.copyTo( oldFrame );
   frameIndex++;
 
@@ -96,7 +102,7 @@ void kltTracker::processTrackerResults( vector<Point2f> newPoints,
   }
 }
 
-void kltTracker::findNewFeatures()
+void kltTracker::findNewFeatures(Mat grayImage)
 {
   if (oldPoints.size() < 200)
   {
@@ -106,6 +112,8 @@ void kltTracker::findNewFeatures()
 
     vector<Point2f> detectedPoints;
     KeyPoint::convert(detectedFeatures, detectedPoints);
+    cornerSubPix(grayImage, detectedPoints, subPixWinSize, Size(-1,-1), termcrit);
+
     oldPoints.insert(oldPoints.end(), detectedPoints.begin(), detectedPoints.end() );
 
     vector<pointHistory> history;

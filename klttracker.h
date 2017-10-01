@@ -28,7 +28,7 @@ public:
 private:
   void processTrackerResults( vector<Point2f> newPoints,
                              vector<uchar> trackStatus);
-  void findNewFeatures();
+  void findNewFeatures( Mat grayImage );
 
   void eraseMissingFeature( vector<vector<pointHistory>>::iterator featuresHistoryIterator,
       vector<Point2f>::iterator oldPointsIterator
@@ -38,8 +38,9 @@ private:
                             pointHistory extractedFeature );
 
   void printTrackSizes(int numNewPoints);
+  void printTrackSizes();
 private:
-  Mat featureImage, oldFrame, grayImage;
+  Mat featureImage, oldFrame;
 
   Ptr<GFTTDetector> featureDetector;
   vector<Point2f> oldPoints;
