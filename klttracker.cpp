@@ -47,7 +47,9 @@ Mat kltTracker::update(Mat image)
 
   calcOpticalFlowPyrLK(oldFrame, grayImage, oldPoints, pointsNew, status, err);
   processTrackerResults( pointsNew, status );
-  printTrackSizes( (int) pointsNew.size() );
+  if (verbose_printouts) {
+    printTrackSizes( (int) pointsNew.size() );
+  }
   status.clear();
 
   cout << "------------ Detecting features -----------------" << endl;
@@ -60,9 +62,13 @@ Mat kltTracker::update(Mat image)
 
 vector<vector<pointHistory> > kltTracker::getAndClearLostTrackBuffer()
 {
-  vector<vector<pointHistory>> lostTrackBufferTemp = lostTrackBuffer;
+  vector<vector<pointHistory> > lostTrackBufferTemp = lostTrackBuffer;
   lostTrackBuffer.clear();
   return lostTrackBufferTemp;
+}
+
+vector<vector<pointHistory> > kltTracker::GetCurrentTracks() const {
+  return featuresHistory;
 }
 
 void kltTracker::processTrackerResults( vector<Point2f> newPoints,
@@ -70,7 +76,7 @@ void kltTracker::processTrackerResults( vector<Point2f> newPoints,
 {
   int i;
   vector<Point2f>::iterator oldPointsIterator, newPointIterator;
-  vector<vector<pointHistory>>::iterator featuresHistoryIterator;
+  vector<vector<pointHistory> >::iterator featuresHistoryIterator;
   for ( // loop initialization
         i = 0,
         oldPointsIterator = oldPoints.begin(),
@@ -85,7 +91,7 @@ void kltTracker::processTrackerResults( vector<Point2f> newPoints,
     pointHistory extractedFeature;
     extractedFeature.frameIndex = frameIndex;
     extractedFeature.position = *newPointIterator;
-    if (trackStatus[i] == featureStatus::failedTrack)
+    if (trackStatus[i] == failedTrack)
     {
       eraseMissingFeature(featuresHistoryIterator, oldPointsIterator);
     }
@@ -112,7 +118,7 @@ void kltTracker::findNewFeatures(Mat grayImage)
 
     vector<Point2f> detectedPoints;
     KeyPoint::convert(detectedFeatures, detectedPoints);
-    cornerSubPix(grayImage, detectedPoints, subPixWinSize, Size(-1,-1), termcrit);
+    //cornerSubPix(grayImage, detectedPoints, subPixWinSize, Size(-1,-1), termcrit);
 
     oldPoints.insert(oldPoints.end(), detectedPoints.begin(), detectedPoints.end() );
 
@@ -127,12 +133,14 @@ void kltTracker::findNewFeatures(Mat grayImage)
       featuresHistory.push_back(history);
       history.clear();
     }
-    printTrackSizes();
+    if (verbose_printouts) {
+      printTrackSizes();
+    }
   }
 }
 
 void kltTracker::eraseMissingFeature(
-    vector<vector<pointHistory>>::iterator featuresHistoryIterator,
+    vector<vector<pointHistory> >::iterator featuresHistoryIterator,
     vector<Point2f>::iterator oldPointsIterator
     )
 {
@@ -160,3 +168,14 @@ void kltTracker::printTrackSizes()
   cout << "Old feature vector size: " << oldPoints.size() << endl;
   cout << "Feature History size: " << featuresHistory.size() << endl;
 }
+
+void kltTracker::setVerbosePrintOut()
+{
+  verbose_printouts = true;
+}
+
+void kltTracker::unsetVerbosePrintOut()
+{
+  verbose_printouts = false;
+}
+

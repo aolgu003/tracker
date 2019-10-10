@@ -21,7 +21,7 @@ int main()
   cap >> frame;
   cout << "Starting tracker" << endl;
   kltTracker tracker(frame);
-  vector<vector<pointHistory>> lostTrackBuffer;
+  vector<vector<pointHistory> > lostTrackBuffer;
 
   while (1)
   {

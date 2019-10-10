@@ -23,14 +23,15 @@ public:
   kltTracker(cv::Mat initialImage);
 
   Mat update(cv::Mat image);
-  vector<vector<pointHistory>> getAndClearLostTrackBuffer();
+  vector<vector<pointHistory> > GetCurrentTracks() const;
+  vector<vector<pointHistory> > getAndClearLostTrackBuffer();
 
 private:
   void processTrackerResults( vector<Point2f> newPoints,
                              vector<uchar> trackStatus);
   void findNewFeatures( Mat grayImage );
 
-  void eraseMissingFeature( vector<vector<pointHistory>>::iterator featuresHistoryIterator,
+  void eraseMissingFeature( vector<vector<pointHistory> >::iterator featuresHistoryIterator,
       vector<Point2f>::iterator oldPointsIterator
       );
 
@@ -39,14 +40,19 @@ private:
 
   void printTrackSizes(int numNewPoints);
   void printTrackSizes();
+
+  void setVerbosePrintOut();
+  void unsetVerbosePrintOut();
+
 private:
+  bool verbose_printouts = false;
   Mat featureImage, oldFrame;
 
   Ptr<GFTTDetector> featureDetector;
   vector<Point2f> oldPoints;
 
-  vector<vector<pointHistory>> featuresHistory;
-  vector<vector<pointHistory>> lostTrackBuffer;
+  vector<vector<pointHistory> > featuresHistory;
+  vector<vector<pointHistory> > lostTrackBuffer;
 
   int frameIndex = 0;
   TermCriteria termcrit;
