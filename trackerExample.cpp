@@ -26,10 +26,21 @@ int main()
   while (1)
   {
     cap >> frame;
+    cv::Mat color_frame;
     Mat featureImage = tracker.update(frame);
-    imshow("Features image", featureImage);
     cout << "Getting track buffer" << endl;
     lostTrackBuffer = tracker.getAndClearLostTrackBuffer();
+    auto current_tracks = tracker.GetCurrentTracks();
+    std::cout << current_tracks.size() << std::endl;
+    for (size_t i = 0; i < current_tracks.size(); i++) {
+      auto feature_tracks = current_tracks[i];
+      std::cout << feature_tracks.size() << std::endl;
+      for (size_t j = 0; j < feature_tracks.size(); j++) {
+        auto pt = feature_tracks[j].position;
+        cv::circle(featureImage, pt, 1, cv::Scalar(255,0,0));
+      }
+    }
+    imshow("Features image", featureImage);
     cout << "Track buffer: " << lostTrackBuffer.size() << endl;
     if( waitKey(10) == 27 ) return 0; // stop capturing by pressing ESC
   }
