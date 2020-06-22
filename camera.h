@@ -3,7 +3,6 @@
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-//#include <eigen3/Eigen/Core>
 #include <gtsam/geometry/Pose3.h>
 
 class Camera {
@@ -93,4 +92,5 @@ double ComputeResidual(const Camera& host_frame,
   auto host_intensity = host_frame.GetPixelValue(host_pixel_meas);
   return target_intensity - host_intensity;
 }
+
 #endif CAMERA_H
