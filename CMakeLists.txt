@@ -42,7 +42,9 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-add_library( klttracker klttracker.cpp camera.h)
+include_directories(.)
+
+add_library( klttracker klttracker.cpp photometric_error_factor.h camera.h)
 target_link_libraries( klttracker ${OpenCV_LIBS} )
 
 add_executable( trackerExample trackerExample.cpp )

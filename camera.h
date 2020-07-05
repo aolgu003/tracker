@@ -20,6 +20,9 @@ public:
   , pu_(pu)
   , pv_(pv) {}
 
+  Camera(const cv::Mat& frame, const gtsam::Vector& intrinsics) :
+    Camera(frame, intrinsics(0), intrinsics(1), intrinsics(2), intrinsics(3)) {}
+
   Camera(const cv::Mat& frame, double fu, double fv, double pu, double pv) : 
   fu_(fu)
   , fv_(fv)
