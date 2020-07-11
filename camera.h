@@ -96,4 +96,4 @@ double ComputeResidual(const Camera& host_frame,
   return target_intensity - host_intensity;
 }
 
-#endif CAMERA_H
+#endif // CAMERA_H

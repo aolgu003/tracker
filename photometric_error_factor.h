@@ -44,7 +44,7 @@ public:
                        boost::optional<gtsam::Matrix&> H4 = boost::none) const  
   {
     auto T_target_host = T_target_world * T_host_world.inverse();
-    Camera target_frame(target_image_, intrinsics);
+    Camera target_frame(target_image_, intrinsics(0), intrinsics(1), intrinsics(2), intrinsics(3));
     auto host_bearing = target_frame.ComputePixelBearing(pixel_meas_);
     auto host_point = host_bearing * 1/inv_depth(0);
     auto predicted_target_point = T_target_host * host_point;
@@ -65,4 +65,4 @@ public:
   const gtsam::Key host_pose_key_;
 };
 
-#endif  PHOTOMETRIC_ERROR_FACTOR
+#endif // PHOTOMETRIC_ERROR_FACTOR
